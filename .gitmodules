@@ -1,0 +1,3 @@
+[submodule "CFNetworkKit/Vendor/CFFoundation"]
+	path = CFNetworkKit/Vendor/CFFoundation
+	url = https://github.com/rongfei3380/CFFoundation

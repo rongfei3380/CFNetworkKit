@@ -9,14 +9,15 @@
 #import "CFBaseAPIClient.h"
 #import "AFHTTPSessionManager.h"
 #import <sys/sysctl.h>
-#import "CFCodecUtilities.h"
 #import "CFBaseResponseErrorParser.h"
+#import "AFNetworking.h"
 #import "CFFoundation.h"
-
 
 @interface CFBaseAPIClient (){
     AFHTTPSessionManager *_httpSessionManager;
 }
+
+@property (nonatomic, strong) NSString *baseUrl;
 
 @property (nonatomic, strong) dispatch_queue_t synchronizationQueue;
 @property (nonatomic, strong) dispatch_queue_t responseQueue;
@@ -46,8 +47,8 @@
 
 + (instancetype)allocWithZone:(struct _NSZone *)zone {
     return [self sharedInstance];
-
 }
+
 
 // 重写方法 必不可少
 - (id)copyWithZone:(NSZone *)zone {
@@ -56,9 +57,14 @@
 
 - (instancetype)init{
     if (self = [super init]) {
-        _configuration = [CFBaseAPIClient defaultURLSessionConfiguration];
-        _httpSessionManager = [[AFHTTPSessionManager alloc] initWithSessionConfiguration:_configuration];
         
+        _baseUrl = @"https://reqres.in";
+        
+        _configuration = [CFBaseAPIClient defaultURLSessionConfiguration];
+//
+        _httpSessionManager = [[AFHTTPSessionManager alloc] initWithBaseURL:[NSURL URLWithString:_baseUrl] sessionConfiguration:_configuration];
+//
+        _requestSerializer = [AFJSONRequestSerializer serializer];
         _httpSessionManager.requestSerializer = _requestSerializer;
         
         _responseSerializer = [AFJSONResponseSerializer serializer];
@@ -106,7 +112,6 @@ static NSString *staticUserAgent = nil;
     configuration.requestCachePolicy = NSURLRequestUseProtocolCachePolicy;
     configuration.allowsCellularAccess = YES;
     configuration.timeoutIntervalForRequest = 60.0;
-    
     
     // set the default HTTP headers
     [configuration.HTTPAdditionalHeaders setValue:[self defaultUserAgent] forKey:@"User-Agent"];
@@ -157,15 +162,15 @@ static NSString *staticUserAgent = nil;
                 failureBlock(error);
             }
         } else if (successBlock) {
-            NSDictionary *dataDic = [(NSDictionary *)responseObject objectForKey:@"data"];
+            NSDictionary *dataDic = (NSDictionary *)responseObject;
             //TODO. 特殊处理
             
             DDLogDebug(@"path!!! = %@", path);
-            //            LXDebugLog(@"retVal!!! = %@", (NSDictionary *)JSON);
+            DDLogDebug(@"retVal!!! = %@", responseObject);
             
-            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:responseObject options:NSJSONWritingPrettyPrinted error:nil];
-            NSString *jsonStr = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
-            DDLogDebug(@"retVal Str !!! = %@", jsonStr);
+//            NSData *jsonData = [NSJSONSerialization dataWithJSONObject:responseObject options:NSJSONWritingPrettyPrinted error:nil];
+//            NSString *jsonStr = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+//            DDLogDebug(@"retVal Str !!! = %@", jsonStr);
             
             
             successBlock(dataDic);
@@ -182,35 +187,45 @@ static NSString *staticUserAgent = nil;
     
     switch (method) {
         case CFHTTPRequestMethodGET: {
-            [_httpSessionManager GET:@"" parameters:nil progress:^(NSProgress * _Nonnull downloadProgress) {
+            [_httpSessionManager GET:path parameters:parameters progress:^(NSProgress * _Nonnull downloadProgress) {
                 
             } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-                
+                if (requestSuccessBlock) {
+                    requestSuccessBlock(task, responseObject);
+                }
             } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-                
+                if (requestFailureBlock) {
+                    requestFailureBlock(task, error);
+                }
             }];
         }
             break;
         case CFHTTPRequestMethodPOST: {
-            [_httpSessionManager POST:@"" parameters:nil progress:^(NSProgress * _Nonnull uploadProgress) {
+            [_httpSessionManager POST:path parameters:parameters progress:^(NSProgress * _Nonnull uploadProgress) {
                 
             } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-                
+                if (requestSuccessBlock) {
+                    requestSuccessBlock(task, responseObject);
+                }
             } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-                
+                if (requestFailureBlock) {
+                    requestFailureBlock(task, error);
+                }
             }];
         }
             break;
         case CFHTTPRequestMethodPUT: {
-            [_httpSessionManager PUT:@"" parameters:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-                
+            [_httpSessionManager PUT:path parameters:parameters success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+                requestSuccessBlock(task, responseObject);
             } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-                
+                if (requestFailureBlock) {
+                    requestFailureBlock(task, error);
+                }
             }];
         }
             break;
         case CFHTTPRequestMethodDELETE: {
-            [_httpSessionManager DELETE:@"" parameters:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+            [_httpSessionManager DELETE:path parameters:parameters success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
                 
             } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
                 
@@ -220,6 +235,93 @@ static NSString *staticUserAgent = nil;
         default:
             break;
     }
+}
+
+/**
+ 附加基本的请求参数，每个请求都会带  根据实际业务需求处理
+ */
+- (void)appendRequestParameters:(NSMutableDictionary *)parameters {
+    
+}
+
+
+
+#pragma mark- TEST
+
+- (void)testSucess:(CFAPIClientSuccessBlock)successBlock
+      failureBlock:(CFAPIClientFailureBlock)failureBlock {
+    
+    [self sendRequest:CFHTTPRequestMethodGET path:@"api/users"
+           parameters:nil
+              success:^(id  _Nonnull dataBody) {
+                  if (successBlock) {
+                      successBlock(dataBody);
+                  }
+    } failure:^(NSError * _Nonnull error) {
+        if (failureBlock) {
+            failureBlock(error);
+        }
+    }];
+}
+
+- (void)getUsersListWithPage:(NSInteger )page
+                     success:(CFAPIClientSuccessBlock)successBlock
+                failureBlock:(CFAPIClientFailureBlock)failureBlock {
+    
+    NSMutableDictionary *paramDic = [NSMutableDictionary dictionary];
+    
+    [paramDic setObject:[NSString stringWithFormat:@"%ld" , page] forKey:@"page"];
+    
+    
+    [self sendRequest:CFHTTPRequestMethodGET path:@"api/users" parameters:paramDic success:^(id  _Nonnull dataBody) {
+        if (successBlock) {
+            successBlock(dataBody);
+        }
+    } failure:^(NSError * _Nonnull error) {
+        if (failureBlock) {
+            failureBlock(error);
+        }
+    }];
+}
+
+- (void)loginWithUserName:(NSString *)username
+                 password:(NSString *)password
+                  success:(CFAPIClientSuccessBlock)successBlock
+             failureBlock:(CFAPIClientFailureBlock)failureBlock {
+    
+    NSMutableDictionary *paramDic = [NSMutableDictionary dictionary];
+    [paramDic setObject:username forKey:@"email"];
+//    [paramDic setObject:password forKey:@"password"];
+    
+    [self sendRequest:CFHTTPRequestMethodPOST path:@"api/login" parameters:paramDic success:^(id  _Nonnull dataBody) {
+        if (successBlock) {
+            successBlock(dataBody);
+        }
+    } failure:^(NSError * _Nonnull error) {
+        if (failureBlock) {
+            failureBlock(error);
+        }
+    }];
+}
+
+- (void)updateUserWithName:(NSString *)name
+                       job:(NSString *)job
+                   success:(CFAPIClientSuccessBlock)successBlock
+              failureBlock:(CFAPIClientFailureBlock)failureBlock {
+    NSMutableDictionary *paramDic = [NSMutableDictionary dictionary];
+    [paramDic setObject:name forKey:@"name"];
+    [paramDic setObject:job forKey:@"job"];
+    
+    [self sendRequest:CFHTTPRequestMethodPUT path:@"/api/users/2" parameters:paramDic success:^(id  _Nonnull dataBody) {
+        if (successBlock) {
+            successBlock(dataBody);
+        }
+    } failure:^(NSError * _Nonnull error) {
+        if (failureBlock) {
+            failureBlock(error);
+        }
+    }];
+    
 }
 
 @end

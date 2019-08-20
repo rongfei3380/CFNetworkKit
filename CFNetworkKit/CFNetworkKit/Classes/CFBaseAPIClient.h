@@ -45,6 +45,46 @@ typedef void (^CFAPIClientUploaderBlock) (NSInteger bytesWritten, NSInteger tota
  */
 - (void)clearAuthorizationHeader;
 
+
+
+#pragma mark- test
+
+- (void)testSucess:(CFAPIClientSuccessBlock)successBlock
+      failureBlock:(CFAPIClientFailureBlock)failureBlock;
+
+- (void)getUsersListWithPage:(NSInteger )page
+                     success:(CFAPIClientSuccessBlock)successBlock
+                failureBlock:(CFAPIClientFailureBlock)failureBlock;
+
+
+/**
+ 测试登录
+
+ @param username eve.holt@reqres.in
+ @param password cityslicka
+ @param successBlock
+ @param failureBlock
+ */
+- (void)loginWithUserName:(NSString *)username
+                 password:(NSString *)password
+                  success:(CFAPIClientSuccessBlock)successBlock
+             failureBlock:(CFAPIClientFailureBlock)failureBlock;
+
+
+/**
+ 测试 PUT 方法
+
+ @param name morpheus
+ @param job zion resident
+ @param successBlock
+ @param failureBlock 
+ */
+- (void)updateUserWithName:(NSString *)name
+                       job:(NSString *)job
+                   success:(CFAPIClientSuccessBlock)successBlock
+              failureBlock:(CFAPIClientFailureBlock)failureBlock;
+
+
 @end
 
 NS_ASSUME_NONNULL_END
