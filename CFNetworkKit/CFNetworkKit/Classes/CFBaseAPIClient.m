@@ -17,7 +17,7 @@
     AFHTTPSessionManager *_httpSessionManager;
 }
 
-@property (nonatomic, strong) NSString *baseUrl;
+
 
 @property (nonatomic, strong) dispatch_queue_t synchronizationQueue;
 @property (nonatomic, strong) dispatch_queue_t responseQueue;
@@ -58,7 +58,7 @@
 - (instancetype)init{
     if (self = [super init]) {
         
-        _baseUrl = @"https://reqres.in";
+        _baseUrl = @"http://www.oneoff.net/index.php?m=api&c=apimap&a=";
         
         _configuration = [CFBaseAPIClient defaultURLSessionConfiguration];
 //

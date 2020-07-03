@@ -27,8 +27,16 @@ typedef void (^CFAPIClientUploaderBlock) (NSInteger bytesWritten, NSInteger tota
  */
 @interface CFBaseAPIClient : NSObject
 
+@property (nonatomic, strong) NSString *baseUrl;
+
 + (instancetype)sharedInstance;
 
+
+- (void)sendRequest:(CFHTTPRequestMethod)method
+               path:(NSString *)path
+         parameters:(NSDictionary *)parameters
+            success:(CFAPIClientSuccessBlock)successBlock
+            failure:(CFAPIClientFailureBlock)failureBlock;
 
 /**
  Sets the "Authorization" HTTP header set in request objects made by the HTTP client to a basic authentication value with Base64-encoded username and password. This overwrites any existing value for this header.
