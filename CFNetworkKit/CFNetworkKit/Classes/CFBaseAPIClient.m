@@ -10,7 +10,7 @@
 #import "AFHTTPSessionManager.h"
 #import <sys/sysctl.h>
 #import "CFBaseResponseErrorParser.h"
-#import "AFNetworking.h"
+#import "AFNetworking-umbrella.h"
 #import "CFFoundation.h"
 
 @interface CFBaseAPIClient (){
@@ -187,49 +187,49 @@ static NSString *staticUserAgent = nil;
     
     switch (method) {
         case CFHTTPRequestMethodGET: {
-            [_httpSessionManager GET:path parameters:parameters progress:^(NSProgress * _Nonnull downloadProgress) {
-                
-            } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-                if (requestSuccessBlock) {
-                    requestSuccessBlock(task, responseObject);
-                }
-            } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-                if (requestFailureBlock) {
-                    requestFailureBlock(task, error);
-                }
-            }];
+//            [_httpSessionManager GET:path parameters:parameters progress:^(NSProgress * _Nonnull downloadProgress) {
+//
+//            } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+//                if (requestSuccessBlock) {
+//                    requestSuccessBlock(task, responseObject);
+//                }
+//            } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+//                if (requestFailureBlock) {
+//                    requestFailureBlock(task, error);
+//                }
+//            }];
         }
             break;
         case CFHTTPRequestMethodPOST: {
-            [_httpSessionManager POST:path parameters:parameters progress:^(NSProgress * _Nonnull uploadProgress) {
-                
-            } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-                if (requestSuccessBlock) {
-                    requestSuccessBlock(task, responseObject);
-                }
-            } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-                if (requestFailureBlock) {
-                    requestFailureBlock(task, error);
-                }
-            }];
+//            [_httpSessionManager POST:path parameters:parameters progress:^(NSProgress * _Nonnull uploadProgress) {
+//
+//            } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+//                if (requestSuccessBlock) {
+//                    requestSuccessBlock(task, responseObject);
+//                }
+//            } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+//                if (requestFailureBlock) {
+//                    requestFailureBlock(task, error);
+//                }
+//            }];
         }
             break;
         case CFHTTPRequestMethodPUT: {
-            [_httpSessionManager PUT:path parameters:parameters success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-                requestSuccessBlock(task, responseObject);
-            } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-                if (requestFailureBlock) {
-                    requestFailureBlock(task, error);
-                }
-            }];
+//            [_httpSessionManager PUT:path parameters:parameters success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+//                requestSuccessBlock(task, responseObject);
+//            } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+//                if (requestFailureBlock) {
+//                    requestFailureBlock(task, error);
+//                }
+//            }];
         }
             break;
         case CFHTTPRequestMethodDELETE: {
-            [_httpSessionManager DELETE:path parameters:parameters success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
-                
-            } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
-                
-            }];
+//            [_httpSessionManager DELETE:path parameters:parameters success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+//                
+//            } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
+//                
+//            }];
         }
             break;
         default:
