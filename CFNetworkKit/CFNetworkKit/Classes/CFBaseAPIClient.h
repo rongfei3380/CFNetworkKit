@@ -32,7 +32,7 @@ typedef void (^CFAPIClientUploaderBlock) (NSInteger bytesWritten, NSInteger tota
 + (instancetype)sharedInstance;
 
 
-- (void)sendRequest:(CFHTTPRequestMethod)method
+- (NSURLSessionDataTask *)sendRequest:(CFHTTPRequestMethod)method
                path:(NSString *)path
          parameters:(NSDictionary *)parameters
             success:(CFAPIClientSuccessBlock)successBlock

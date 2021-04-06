@@ -142,7 +142,7 @@ static NSString *staticUserAgent = nil;
 /**
  负责发送API请求
  */
-- (void)sendRequest:(CFHTTPRequestMethod)method
+- (NSURLSessionDataTask *)sendRequest:(CFHTTPRequestMethod)method
                path:(NSString *)path
          parameters:(NSDictionary *)parameters
             success:(CFAPIClientSuccessBlock)successBlock
@@ -235,6 +235,7 @@ static NSString *staticUserAgent = nil;
         default:
             break;
     }
+    return nil;
 }
 
 /**
